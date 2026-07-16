@@ -3,61 +3,83 @@
 <head>
     <title>For You ❤️</title>
     <style>
-        body {
-            margin: 0;
-            background: #000;
-            overflow: hidden;
-        }
-        canvas {
-            display: block;
-        }
+        body { margin: 0; background: #000; overflow: hidden; }
+        canvas { display: block; }
         h1 {
-            position: absolute;
-            top: 80%;
-            width: 100%;
-            text-align: center;
-            color: #00f7ff;
-            font-family: Arial;
-            font-size: 30px;
-            text-shadow: 0 0 20px #00f7ff;
+            position: absolute; top: 75%; width: 100%;
+            text-align: center; color: #00f7ff; font-family: 'Arial';
+            font-size: 32px; text-shadow: 0 0 10px #00f7ff, 0 0 20px #00f7ff, 0 0 30px #00f7ff;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #00f7ff; }
+            to { text-shadow: 0 0 20px #00f7ff, 0 0 30px #00f7ff; }
         }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
-    <h1>Happy Birthday [gumawa] ❤️</h1>
-
+    <h1>Happy Birthday ❤️</h1>
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        
+        let angle = 0;
+        let particles = [];
 
-        function draw() {
+        // bikin partikel
+        for(let i = 0; i < 100; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2
+            });
+        }
+
+        function drawHeart(scale) {
+            ctx.beginPath();
+            for(let t = 0; t < Math.PI * 2; t += 0.01) {
+                let x = 16 * Math.pow(Math.sin(t), 3);
+                let y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+                let px = canvas.width/2 + x * scale;
+                let py = canvas.height/2 - y * scale;
+                if(t === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+        }
+
+        function animate() {
             ctx.fillStyle = 'rgba(0,0,0,0.1)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            ctx.strokeStyle = '#00f7ff';
-            ctx.shadowBlur = 20;
-            ctx.shadowColor = '#00f7ff';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            
+
+            // gambar partikel
+            ctx.fillStyle = '#00f7ff';
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                p.y -= 0.5;
+                if(p.y < 0) p.y = canvas.height;
+            });
+
+            // gambar 3 lapis hati
             for(let i = 0; i < 3; i++) {
-                for(let t = 0; t < Math.PI * 2; t += 0.01) {
-                    let scale = 15 + i * 5;
-                    let x = 16 * Math.pow(Math.sin(t), 3);
-                    let y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
-                    let px = canvas.width/2 + x * scale;
-                    let py = canvas.height/2 - y * scale;
-                    if(t === 0) ctx.moveTo(px, py);
-                    else ctx.lineTo(px, py);
-                }
+                let scale = 15 + i * 5 + Math.sin(angle + i) * 2;
+                drawHeart(scale);
+                ctx.strokeStyle = '#00f7ff';
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = '#00f7ff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
             }
-            ctx.stroke();
-            requestAnimationFrame(draw);
+            
+            angle += 0.02;
+            requestAnimationFrame(animate);
         }
-        draw();
+        animate();
     </script>
 </body>
 </html>

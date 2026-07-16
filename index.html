@@ -6,20 +6,15 @@
         body { margin: 0; background: #000; overflow: hidden; }
         canvas { display: block; }
         h1 {
-            position: absolute; top: 75%; width: 100%;
-            text-align: center; color: #00f7ff; font-family: 'Arial';
-            font-size: 32px; text-shadow: 0 0 10px #00f7ff, 0 0 20px #00f7ff, 0 0 30px #00f7ff;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-        @keyframes glow {
-            from { text-shadow: 0 0 10px #00f7ff; }
-            to { text-shadow: 0 0 20px #00f7ff, 0 0 30px #00f7ff; }
+            position: absolute; top: 80%; width: 100%;
+            text-align: center; color: #00f7ff; font-family: Arial;
+            font-size: 28px; text-shadow: 0 0 20px #00f7ff;
         }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
-    <h1>Happy Birthday ❤️</h1>
+    <h1>For You ❤️</h1>
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -27,56 +22,39 @@
         canvas.height = window.innerHeight;
         
         let angle = 0;
-        let particles = [];
 
-        // bikin partikel
-        for(let i = 0; i < 100; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 2
-            });
-        }
-
-        function drawHeart(scale) {
-            ctx.beginPath();
-            for(let t = 0; t < Math.PI * 2; t += 0.01) {
-                let x = 16 * Math.pow(Math.sin(t), 3);
-                let y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
-                let px = canvas.width/2 + x * scale;
-                let py = canvas.height/2 - y * scale;
-                if(t === 0) ctx.moveTo(px, py);
-                else ctx.lineTo(px, py);
-            }
-            ctx.closePath();
+        function getHeartPoint(t, scale) {
+            let x = 16 * Math.pow(Math.sin(t), 3);
+            let y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+            return [
+                canvas.width/2 + x * scale,
+                canvas.height/2 - y * scale
+            ];
         }
 
         function animate() {
-            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            ctx.fillStyle = 'rgba(0,0,0,0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // gambar partikel
-            ctx.fillStyle = '#00f7ff';
-            particles.forEach(p => {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-                p.y -= 0.5;
-                if(p.y < 0) p.y = canvas.height;
-            });
+            ctx.strokeStyle = '#00f7ff';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#00f7ff';
+            ctx.lineWidth = 1;
 
-            // gambar 3 lapis hati
-            for(let i = 0; i < 3; i++) {
-                let scale = 15 + i * 5 + Math.sin(angle + i) * 2;
-                drawHeart(scale);
-                ctx.strokeStyle = '#00f7ff';
-                ctx.shadowBlur = 30;
-                ctx.shadowColor = '#00f7ff';
-                ctx.lineWidth = 2;
+            // bikin banyak lapis hati yg muter
+            for(let layer = 0; layer < 5; layer++) {
+                ctx.beginPath();
+                let scale = 12 + layer * 4;
+                for(let i = 0; i <= 360; i++) {
+                    let t = i * Math.PI / 180;
+                    let [x, y] = getHeartPoint(t + angle + layer * 0.2, scale);
+                    if(i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
                 ctx.stroke();
             }
-            
-            angle += 0.02;
+
+            angle += 0.005; // kecepatan muter
             requestAnimationFrame(animate);
         }
         animate();

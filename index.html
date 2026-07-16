@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>For You ❤️</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+        h1 {
+            position: absolute;
+            top: 80%;
+            width: 100%;
+            text-align: center;
+            color: #00f7ff;
+            font-family: Arial;
+            font-size: 30px;
+            text-shadow: 0 0 20px #00f7ff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <h1>Happy Birthday [gumawa] ❤️</h1>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#00f7ff';
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#00f7ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            for(let i = 0; i < 3; i++) {
+                for(let t = 0; t < Math.PI * 2; t += 0.01) {
+                    let scale = 15 + i * 5;
+                    let x = 16 * Math.pow(Math.sin(t), 3);
+                    let y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+                    let px = canvas.width/2 + x * scale;
+                    let py = canvas.height/2 - y * scale;
+                    if(t === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
+</html>
